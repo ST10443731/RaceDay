@@ -1,0 +1,4 @@
+Create Table Role(
+RoleId Int IDENTITY(1,1) PRIMARY KEY,
+RoleName VARCHAR (30) NOT NULL UNIQUE
+)
