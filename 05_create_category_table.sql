@@ -1,0 +1,8 @@
+Create Table Category(
+CategoryId INT IDENTITY (1,1) PRIMARY KEY,
+EventId INT NOT NULL,
+Name VARCHAR(50) NOT NULL,
+DistanceKm DECIMAL(5,2) NOT NULL,
+MaxParticipants INT NOT NULL DEFAULT 100,
+CONSTRAINT FK_Category_Event FOREIGN KEY (EventId) REFERENCES Event(EventId)
+)
