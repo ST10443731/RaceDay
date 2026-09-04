@@ -4,5 +4,5 @@ EnrolmentId INT NOT NULL UNIQUE,
 FinidhTime TIME NOT NULL,
 Position INT NOT NULL,
 RecordedAt DATETIME NOT NULL DEFAULT GETDATE(),
-CONSTRAINT FK_Result_Enrolment FOREIGN KEY (EnromentId) REFERENCES Enrolment(EnrolmentId)
+CONSTRAINT FK_Result_Enrolment FOREIGN KEY (EnrolmentId) REFERENCES Enrolment(EnrolmentId)
 )
