@@ -1,0 +1,48 @@
+name: Validate Repository Structure
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check /docs folder exists
+        run: |
+          if [ ! -d "docs" ]; then
+            echo "ERROR: /docs folder is missing"
+            exit 1
+          fi
+          echo "OK: /docs folder found"
+
+      - name: Check for ERD image
+        run: |
+          shopt -s nocaseglob
+          if ! ls docs/*ERD*.png >/dev/null 2>&1 && ! ls docs/*ERD*.pdf >/dev/null 2>&1; then
+            echo "ERROR: No ERD file found in /docs"
+            exit 1
+          fi
+          echo "OK: ERD file found"
+
+      - name: Check for API endpoint plan
+        run: |
+          shopt -s nocaseglob
+          if ! ls docs/*endpoint*plan*.pdf >/dev/null 2>&1 && ! ls docs/*endpoint*plan*.md >/dev/null 2>&1; then
+            echo "ERROR: No API endpoint plan found in /docs"
+            exit 1
+          fi
+          echo "OK: API endpoint plan found"
+
+      - name: Check for SQL script
+        run: |
+          if ! ls docs/*.sql >/dev/null 2>&1; then
+            echo "ERROR: No .sql file found in /docs"
+            exit 1
+          fi
+          echo "OK: SQL script(s) found"
