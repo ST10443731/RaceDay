@@ -4,3 +4,7 @@ This repository covers Part 1 of the project: planning the system before writing
 
 CI/CG SCREENSHOT
 <img width="963" height="135" alt="Screenshot 2026-09-04 113729" src="https://github.com/user-attachments/assets/64e0ea00-fe20-4d1e-a2ba-bf66749b4e75" />
+
+YOUTUBE:
+https://youtu.be/-DQjK6aaFsQ
+
