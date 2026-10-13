@@ -1,12 +1,26 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using RaceDay.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "RaceDay API",
+        Version = "v1",
+        Description = "API for managing races: events, categories, enrolments and results. " +
+                      "Users register as an Organizer or a Participant and log in with a session cookie."
+    });
+
+    // Feeds the /// comments into Swagger
+    var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -21,7 +35,6 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// The brief says Swagger must always be viewable, so it isn't limited to Development
 app.UseSwagger();
 app.UseSwaggerUI();
 
