@@ -10,7 +10,8 @@ namespace RaceDay.Api.Controllers
 {
     [ApiController]
     [Route("api/events")]
-    [Authorize]   // both roles get in; stricter rules go on individual methods
+    [Authorize]
+    [Tags("Events")]
     public class EventsController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -18,11 +19,19 @@ namespace RaceDay.Api.Controllers
 
         private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+        /// <summary>
+        /// Lists all upcoming events.
+        /// </summary>
+        /// <remarks>No body needed. Available to both roles. Only events dated today or later are returned.</remarks>
+        /// <response code="200">An array of upcoming events, soonest first.</response>
+        /// <response code="401">Not logged in.</response>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll()
         {
             var events = await _db.Events
-                .Where(e => e.EventDate >= DateTime.Now)   // "upcoming" events only
+                .Where(e => e.EventDate >= DateTime.Now)
                 .OrderBy(e => e.EventDate)
                 .Select(e => new
                 {
@@ -40,7 +49,16 @@ namespace RaceDay.Api.Controllers
             return Ok(events);
         }
 
+        /// <summary>
+        /// Returns the full details of one event, including its categories.
+        /// </summary>
+        /// <response code="200">The event and its categories.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="404">The event does not exist.</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id)
         {
             var ev = await _db.Events
@@ -64,13 +82,28 @@ namespace RaceDay.Api.Controllers
             return Ok(ev);
         }
 
+        /// <summary>
+        /// Creates a new event owned by the logged-in Organizer.
+        /// </summary>
+        /// <remarks>
+        /// Organizer only. Expects name, description, eventDate, location,
+        /// eventType (run, walk or cycle) and routeInfo.
+        /// </remarks>
+        /// <response code="201">Event created. Returns the new event id.</response>
+        /// <response code="400">Validation failed.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">The user is not an Organizer.</response>
         [HttpPost]
-        [Authorize(Roles = "Organizer")]   // a Participant gets 403 here
+        [Authorize(Roles = "Organizer")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Create(EventDto dto)
         {
             var ev = new Event
             {
-                OrganizerId = CurrentUserId,   // from the cookie, not from the request
+                OrganizerId = CurrentUserId,
                 Name = dto.Name,
                 Description = dto.Description,
                 EventDate = dto.EventDate,
@@ -85,13 +118,27 @@ namespace RaceDay.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = ev.EventId }, new { ev.EventId });
         }
 
+        /// <summary>
+        /// Updates an event owned by the logged-in Organizer.
+        /// </summary>
+        /// <remarks>Organizer only, and only for their own events. Expects the same body as creating an event.</remarks>
+        /// <response code="200">The updated event.</response>
+        /// <response code="400">Validation failed.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organizer, or not the owner of this event.</response>
+        /// <response code="404">The event does not exist.</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Organizer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, EventDto dto)
         {
             var ev = await _db.Events.FindAsync(id);
-            if (ev == null) return NotFound();                     // 404: doesn't exist
-            if (ev.OrganizerId != CurrentUserId) return Forbid();  // 403: exists, but not yours
+            if (ev == null) return NotFound();
+            if (ev.OrganizerId != CurrentUserId) return Forbid();
 
             ev.Name = dto.Name;
             ev.Description = dto.Description;
@@ -104,8 +151,20 @@ namespace RaceDay.Api.Controllers
             return Ok(new { ev.EventId, ev.Name, ev.EventDate, ev.Location, ev.EventType });
         }
 
+        /// <summary>
+        /// Deletes an event owned by the logged-in Organizer.
+        /// </summary>
+        /// <remarks>Organizer only, and only for their own events. Its categories, enrolments and results are deleted too.</remarks>
+        /// <response code="204">Event deleted.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organizer, or not the owner of this event.</response>
+        /// <response code="404">The event does not exist.</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Organizer")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             var ev = await _db.Events.FindAsync(id);
@@ -115,7 +174,7 @@ namespace RaceDay.Api.Controllers
             _db.Events.Remove(ev);
             await _db.SaveChangesAsync();
 
-            return NoContent();   // 204, as in your plan
+            return NoContent();
         }
     }
 }
