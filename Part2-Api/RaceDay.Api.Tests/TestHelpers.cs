@@ -14,8 +14,7 @@ namespace RaceDay.Api.Tests
             HttpClient client, string email, string password = "Pass1234")
             => client.PostAsJsonAsync("/api/auth/login", new { email, password });
 
-        // Registers a user, logs in, and returns a client that holds that user's session cookie.
-        // Each client has its own cookie jar, like your normal and incognito windows.
+        // Registers a user, logs in, and returns a client that holds that user's session cookie
         public static async Task<HttpClient> LoggedInClient(ApiFactory factory, string email, string role)
         {
             var client = factory.CreateClient();
@@ -28,7 +27,7 @@ namespace RaceDay.Api.Tests
         {
             name,
             description = "A test event",
-            eventDate = DateTime.Now.AddDays(90),   // always in the future
+            eventDate = DateTime.Now.AddDays(90),
             location = "Johannesburg",
             eventType,
             routeInfo = "Starts and ends at the park"
@@ -41,10 +40,24 @@ namespace RaceDay.Api.Tests
             return json.GetProperty(property).GetInt32();
         }
 
+        // Counts the items in a JSON array response
+        public static async Task<int> CountItems(HttpResponseMessage response)
+        {
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+            return json.GetArrayLength();
+        }
+
         public static async Task<int> CreateEvent(HttpClient organizer)
         {
             var response = await organizer.PostAsJsonAsync("/api/events", EventBody());
             return await ReadId(response, "eventId");
+        }
+
+        public static async Task<int> CreateCategory(HttpClient organizer, int eventId, int max = 2)
+        {
+            var response = await organizer.PostAsJsonAsync($"/api/events/{eventId}/categories",
+                new { name = "10km", distanceKm = 10, maxParticipants = max });
+            return await ReadId(response, "categoryId");
         }
     }
 }
