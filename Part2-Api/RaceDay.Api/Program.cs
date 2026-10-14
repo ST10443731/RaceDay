@@ -19,7 +19,11 @@ builder.Services.AddSwaggerGen(options =>
 
     // Feeds the /// comments into Swagger
     var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))   // the test run may not have this file
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -44,3 +48,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Lets the test project start the whole API
+public partial class Program { }
