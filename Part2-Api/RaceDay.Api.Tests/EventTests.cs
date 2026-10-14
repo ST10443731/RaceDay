@@ -41,9 +41,8 @@ namespace RaceDay.Api.Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        // YOUR TURN: fill in the blank before you run the tests
         [Fact]
-        public async Task Organizer_UpdateAnotherOrganizersEvent_IsRejected()
+        public async Task Organizer_UpdateAnotherOrganizersEvent_Returns403()
         {
             using var factory = new ApiFactory();
             var owner = await TestHelpers.LoggedInClient(factory, "owner@test.com", "Organizer");
@@ -53,8 +52,7 @@ namespace RaceDay.Api.Tests
             // The second organiser tries to edit the first organiser's event
             var response = await other.PutAsJsonAsync($"/api/events/{eventId}", TestHelpers.EventBody());
 
-            // In Swagger this gave 403. What is C#'s name for 403?
-            Assert.Equal(HttpStatusCode.__________, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]
