@@ -148,5 +148,5 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) builds the project and ru
 
 
 
-https://youtu.be/zgXTRt0cmkw
+\[Watch the demo video on YouTube](https://youtu.be/zgXTRt0cmkw)
 
