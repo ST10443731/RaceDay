@@ -36,9 +36,9 @@ namespace RaceDay.Api.Controllers
             return Ok(new { user.UserId, user.FullName, user.Email, Role = user.Role.RoleName, user.CreatedAt });
         }
 
-        /// <summary>
+       
         /// Updates the name and email of the logged-in user.
-        /// </summary>
+        /// 
         /// <remarks>Expects fullName and email. The email must not belong to another user.</remarks>
         /// <response code="200">The updated profile.</response>
         /// <response code="400">Validation failed.</response>

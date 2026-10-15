@@ -15,10 +15,10 @@ namespace RaceDay.Api.Models
         [MaxLength(50)]
         public string Name { get; set; } = string.Empty;
 
-        [Column(TypeName = "decimal(5,2)")]   // DECIMAL(5,2)
+        [Column(TypeName = "decimal(5,2)")]   
         public decimal DistanceKm { get; set; }
 
-        public int MaxParticipants { get; set; } = 100;   // SQL default is 100
+        public int MaxParticipants { get; set; } = 100;  
 
         public List<Enrolment> Enrolments { get; set; } = new();
     }

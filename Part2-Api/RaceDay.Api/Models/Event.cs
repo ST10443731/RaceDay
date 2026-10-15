@@ -16,17 +16,17 @@ namespace RaceDay.Api.Models
         public string Name { get; set; } = string.Empty;
 
         [MaxLength(500)]
-        public string? Description { get; set; }   // "?" means NULL is allowed
+        public string? Description { get; set; }   
 
         public DateTime EventDate { get; set; }
 
         [Required]
         [MaxLength(200)]
-        public string Location { get; set; } = string.Empty;   // new for Part 2
+        public string Location { get; set; } = string.Empty;   
 
         [Required]
         [MaxLength(20)]
-        public string EventType { get; set; } = string.Empty;  // new: run, walk or cycle
+        public string EventType { get; set; } = string.Empty;  
 
         [Required]
         [MaxLength(600)]

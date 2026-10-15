@@ -17,10 +17,10 @@ builder.Services.AddSwaggerGen(options =>
                       "Users register as an Organizer or a Participant and log in with a session cookie."
     });
 
-    // Feeds the /// comments into Swagger
+    
     var xmlFile = $"{typeof(Program).Assembly.GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))   // the test run may not have this file
+    if (File.Exists(xmlPath))   
     {
         options.IncludeXmlComments(xmlPath);
     }
@@ -49,5 +49,5 @@ app.MapControllers();
 
 app.Run();
 
-// Lets the test project start the whole API
+
 public partial class Program { }

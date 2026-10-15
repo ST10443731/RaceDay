@@ -17,14 +17,14 @@ namespace RaceDay.Api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // The UNIQUE rules from your SQL script
+            
             modelBuilder.Entity<Role>().HasIndex(r => r.RoleName).IsUnique();
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
             modelBuilder.Entity<Result>().HasIndex(r => r.EnrolmentId).IsUnique();
             modelBuilder.Entity<Enrolment>()
                 .HasIndex(e => new { e.ParticipantId, e.CategoryId }).IsUnique();
 
-            // Stops SQL Server's "multiple cascade paths" error
+          
             modelBuilder.Entity<Enrolment>()
                 .HasOne(e => e.Participant)
                 .WithMany(u => u.Enrolments)
