@@ -1,0 +1,32 @@
+name: .NET CI/CD
+
+on:
+  push:
+    branches: [ "part3-mvc" ]
+  pull_request:
+    branches: [ "part3-mvc" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+        
+    - name: Restore dependencies (API)
+      run: dotnet restore Part2-Api/RaceDay.Api/RaceDay.Api.csproj
+      
+    - name: Build API
+      run: dotnet build Part2-Api/RaceDay.Api/RaceDay.Api.csproj --no-restore
+      
+    - name: Restore dependencies (MVC)
+      run: dotnet restore Part3-Mvc/RaceDay.Web/RaceDay.Web.csproj
+      
+    - name: Build MVC
+      run: dotnet build Part3-Mvc/RaceDay.Web/RaceDay.Web.csproj --no-restore
