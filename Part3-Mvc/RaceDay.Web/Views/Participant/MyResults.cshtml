@@ -1,0 +1,64 @@
+@model List<RaceDay.Web.Models.ResultViewModel>
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Race Results</h2>
+    <a href="/Home/Index" class="btn btn-primary">Find More Events</a>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        <strong>API Error:</strong> @ViewBag.Error
+    </div>
+}
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">You don't have any race results yet. Once the Organiser captures your finish time, it will appear here!</div>
+}
+else
+{
+    <table class="table table-striped table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Event Name</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Finish Time</th>
+                <th>Position</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.Event</td>
+                    <td>@item.EventDate.ToString("dd MMM yyyy")</td>
+                    <td>@item.Category</td>
+                    <td><span class="badge bg-secondary fs-6">@item.FinishTime</span></td>
+                    <td>
+                        @if (item.Position == 1)
+                        {
+                            <span class="badge bg-warning text-dark fs-6">🥇 1st Place</span>
+                        }
+                        else if (item.Position == 2)
+                        {
+                            <span class="badge bg-secondary fs-6">🥈 2nd Place</span>
+                        }
+                        else if (item.Position == 3)
+                        {
+                            <span class="badge bg-danger fs-6">🥉 3rd Place</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-info text-dark fs-6">@item.Position th Place</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

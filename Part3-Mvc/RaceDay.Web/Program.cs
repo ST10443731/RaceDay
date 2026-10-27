@@ -1,8 +1,13 @@
 using RaceDay.Web.Services;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+// Ignore AntiForgeryToken for now to fix the 405 error
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add(new IgnoreAntiforgeryTokenAttribute());
+});
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -13,9 +18,11 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddHttpContextAccessor();
 
+// Configure HttpClient for the ApiClient
 builder.Services.AddHttpClient<ApiClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+    // Use the Docker Compose service name to connect to the API container
+    client.BaseAddress = new Uri("http://raceday-api:8080/");
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
 {
@@ -23,13 +30,6 @@ builder.Services.AddHttpClient<ApiClient>(client =>
     {
         UseCookies = false
     };
-
-    if (builder.Environment.IsDevelopment())
-    {
-        handler.ServerCertificateCustomValidationCallback =
-            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-    }
-
     return handler;
 });
 

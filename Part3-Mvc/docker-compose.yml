@@ -1,0 +1,24 @@
+services:
+  raceday-api:
+    build:
+      context: ../Part2-Api/RaceDay.Api
+      dockerfile: Dockerfile
+    container_name: raceday-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5156:8080"
+
+  raceday-web:
+    build:
+      context: ./RaceDay.Web
+      dockerfile: Dockerfile
+    container_name: raceday-web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - raceday-api

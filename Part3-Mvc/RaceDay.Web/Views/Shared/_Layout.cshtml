@@ -23,6 +23,18 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
+                        
+                        @if (role == "Organiser" || role == "Organizer")
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a></li>
+                        }
+
+                        @if (role == "Participant")
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Participant" asp-action="MyEnrolments">My Enrolments</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Participant" asp-action="MyResults">My Results</a></li>
+                        }
+
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy (test)</a></li>
                     </ul>
                     <ul class="navbar-nav align-items-center">
