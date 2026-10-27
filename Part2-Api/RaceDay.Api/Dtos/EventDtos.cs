@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace RaceDay.Api.Dtos
 {
@@ -14,5 +15,8 @@ namespace RaceDay.Api.Dtos
         public string EventType { get; set; } = string.Empty;
 
         [Required, MaxLength(600)] public string RouteInfo { get; set; } = string.Empty;
+
+        // NEW: This allows the API to receive the uploaded image
+        public IFormFile? BannerImage { get; set; }
     }
 }

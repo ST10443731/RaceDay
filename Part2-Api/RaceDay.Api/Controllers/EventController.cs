@@ -19,12 +19,6 @@ namespace RaceDay.Api.Controllers
 
         private int CurrentUserId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        /// <summary>
-        /// Lists all upcoming events.
-        /// </summary>
-        /// <remarks>No body needed. Available to both roles. Only events dated today or later are returned.</remarks>
-        /// <response code="200">An array of upcoming events, soonest first.</response>
-        /// <response code="401">Not logged in.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -42,6 +36,7 @@ namespace RaceDay.Api.Controllers
                     e.Location,
                     e.EventType,
                     e.RouteInfo,
+                    e.BannerUrl,
                     Organizer = e.Organizer.FullName
                 })
                 .ToListAsync();
@@ -49,12 +44,6 @@ namespace RaceDay.Api.Controllers
             return Ok(events);
         }
 
-        /// <summary>
-        /// Returns the full details of one event, including its categories.
-        /// </summary>
-        /// <response code="200">The event and its categories.</response>
-        /// <response code="401">Not logged in.</response>
-        /// <response code="404">The event does not exist.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -72,6 +61,7 @@ namespace RaceDay.Api.Controllers
                     e.Location,
                     e.EventType,
                     e.RouteInfo,
+                    e.BannerUrl,
                     Organizer = e.Organizer.FullName,
                     Categories = e.Categories.Select(c => new
                     { c.CategoryId, c.Name, c.DistanceKm, c.MaxParticipants })
@@ -82,24 +72,13 @@ namespace RaceDay.Api.Controllers
             return Ok(ev);
         }
 
-        /// <summary>
-        /// Creates a new event owned by the logged-in Organizer.
-        /// </summary>
-        /// <remarks>
-        /// Organizer only. Expects name, description, eventDate, location,
-        /// eventType (run, walk or cycle) and routeInfo.
-        /// </remarks>
-        /// <response code="201">Event created. Returns the new event id.</response>
-        /// <response code="400">Validation failed.</response>
-        /// <response code="401">Not logged in.</response>
-        /// <response code="403">The user is not an Organizer.</response>
         [HttpPost]
         [Authorize(Roles = "Organizer")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Create(EventDto dto)
+        public async Task<IActionResult> Create([FromForm] EventDto dto)
         {
             var ev = new Event
             {
@@ -112,21 +91,27 @@ namespace RaceDay.Api.Controllers
                 RouteInfo = dto.RouteInfo
             };
 
+            if (dto.BannerImage != null && dto.BannerImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + dto.BannerImage.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.BannerImage.CopyToAsync(stream);
+                }
+                ev.BannerUrl = "/images/" + uniqueFileName;
+            }
+
             _db.Events.Add(ev);
             await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = ev.EventId }, new { ev.EventId });
         }
 
-        /// <summary>
-        /// Updates an event owned by the logged-in Organizer.
-        /// </summary>
-        /// <remarks>Organizer only, and only for their own events. Expects the same body as creating an event.</remarks>
-        /// <response code="200">The updated event.</response>
-        /// <response code="400">Validation failed.</response>
-        /// <response code="401">Not logged in.</response>
-        /// <response code="403">Not an Organizer, or not the owner of this event.</response>
-        /// <response code="404">The event does not exist.</response>
         [HttpPut("{id}")]
         [Authorize(Roles = "Organizer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -151,14 +136,6 @@ namespace RaceDay.Api.Controllers
             return Ok(new { ev.EventId, ev.Name, ev.EventDate, ev.Location, ev.EventType });
         }
 
-        /// <summary>
-        /// Deletes an event owned by the logged-in Organizer.
-        /// </summary>
-        /// <remarks>Organizer only, and only for their own events. Its categories, enrolments and results are deleted too.</remarks>
-        /// <response code="204">Event deleted.</response>
-        /// <response code="401">Not logged in.</response>
-        /// <response code="403">Not an Organizer, or not the owner of this event.</response>
-        /// <response code="404">The event does not exist.</response>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Organizer")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -42,6 +42,9 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+// ADDED THIS LINE:
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
