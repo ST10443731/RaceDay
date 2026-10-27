@@ -10,7 +10,7 @@ namespace RaceDay.Api.Models
         public int EnrolmentId { get; set; }
         public Enrolment Enrolment { get; set; } = null!;
 
-        public TimeSpan FinishTime { get; set; }   /
+        public TimeSpan FinishTime { get; set; }
         public int Position { get; set; }
 
         public DateTime RecordedAt { get; set; } = DateTime.Now;
