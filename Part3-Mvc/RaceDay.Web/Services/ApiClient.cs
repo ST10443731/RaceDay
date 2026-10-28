@@ -14,7 +14,7 @@ namespace RaceDay.Web.Services
             _httpClient = httpClient;
             _httpContextAccessor = httpContextAccessor;
             // USE THE DOCKER SERVICE NAME
-            _httpClient.BaseAddress = new Uri("http://raceday-api:8080/");
+            _httpClient.BaseAddress = new Uri("https://localhost:7040/");
         }
 
         private void AddAuthCookie(HttpRequestMessage request)

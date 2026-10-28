@@ -22,7 +22,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<ApiClient>(client =>
 {
     // Use the Docker Compose service name to connect to the API container
-    client.BaseAddress = new Uri("http://raceday-api:8080/");
+    client.BaseAddress = new Uri("https://localhost:7040/");
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
 {

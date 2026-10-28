@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Part2-Api/">
+    <Project Path="Part2-Api/RaceDay.Api/RaceDay.Api.csproj" />
+  </Folder>
+  <Folder Name="/Part3-Mvc/">
+    <Project Path="Part3-Mvc/RaceDay.Web/RaceDay.Web.csproj" />
+  </Folder>
+</Solution>
