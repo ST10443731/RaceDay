@@ -18,11 +18,8 @@ jobs:
       with:
         dotnet-version: 9.0.x
         
-    - name: Restore dependencies
-      run: dotnet restore RaceDay.sln
+    - name: Build API Project
+      run: dotnet build Part2-Api/RaceDay.Api/RaceDay.Api.csproj
       
-    - name: Build API
-      run: dotnet build Part2-Api/RaceDay.Api/RaceDay.Api.csproj --no-restore
-      
-    - name: Build MVC App
-      run: dotnet build Part3-Mvc/RaceDay.Web/RaceDay.Web.csproj --no-restore
+    - name: Build MVC Project
+      run: dotnet build Part3-Mvc/RaceDay.Web/RaceDay.Web.csproj
